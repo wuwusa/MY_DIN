@@ -17,6 +17,9 @@ class RandomNormal(object):
         embed = torch.nn.Embedding(vocab_size, embed_dim)
         torch.nn.init.normal_(embed.weight, self.mean, self.std)
         return embed
+# get_embedding_layer()方法，回到RandomNormal()方法查看，
+# 此时进入RandomNormal().call()中，使用pytorch的Embedding()方法创造符合正态分布的初始化参数。
+
 
 
 class RandomUniform(object):

@@ -5,10 +5,10 @@ sys.path.append("../..")
 import pandas as pd
 import numpy as np
 import torch
-from torch_rechub.models.ranking import DIN
-from torch_rechub.trainers import CTRTrainer
-from torch_rechub.basic.features import DenseFeature, SparseFeature, SequenceFeature
-from torch_rechub.utils.data import DataGenerator, generate_seq_feature, df_to_dict, pad_sequences
+from model.din import DIN
+from trainer.ctr_trainer import CTRTrainer
+from basic.features import DenseFeature, SparseFeature, SequenceFeature
+from utils.data import DataGenerator, generate_seq_feature, df_to_dict, pad_sequences
 
 
 def get_amazon_data_dict(dataset_path):
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     parser.add_argument('--learning_rate', type=float, default=1e-3)
     parser.add_argument('--batch_size', type=int, default=4096)
     parser.add_argument('--weight_decay', type=float, default=1e-3)
-    parser.add_argument('--device', default='cpu')  #cuda:0
+    parser.add_argument('--device', default='gpu')  #cuda:0
     parser.add_argument('--save_dir', default='./')
     parser.add_argument('--seed', type=int, default=2022)
 

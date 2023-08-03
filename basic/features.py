@@ -32,7 +32,7 @@ class SequenceFeature(object):
             self.embed_dim = get_auto_embedding_dim(vocab_size)
         else:
             self.embed_dim = embed_dim
-        self.pooling = pooling
+        self.pooling = pooling  # 多了Pooling方法
         self.shared_with = shared_with
         self.padding_idx = padding_idx
         self.initializer = initializer
@@ -57,7 +57,8 @@ class SparseFeature(object):
         padding_idx (int, optional): If specified, the entries at padding_idx will be masked 0 in InputMask Layer.
         initializer(Initializer): Initializer the embedding layer weight.
     """
-
+    # embedding table的词汇量，
+    # 即这一项特征一共有多少个类（性别有male和female两个类，vocab_size=2），也就是该语料库的字典大小。
     def __init__(self, name, vocab_size, embed_dim=None, shared_with=None, padding_idx=None, initializer=RandomNormal(0, 0.0001)):
         self.name = name
         self.vocab_size = vocab_size
@@ -89,7 +90,7 @@ class DenseFeature(object):
     def __init__(self, name):
         self.name = name
         self.embed_dim = 1
-
+        # 密集特征是一个连续的有意义值，故维度可直接设置为1
     def __repr__(self):
         return f'<DenseFeature {self.name}>'
 # 用于表示稠密特征。

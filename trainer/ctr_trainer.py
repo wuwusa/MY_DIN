@@ -30,8 +30,8 @@ class CTRTrainer(object):
         scheduler_params=None,
         n_epoch=10,
         earlystop_patience=10,
-        device="cpu",
-        gpus=None,
+        device="gpu",  # 这里改成了gpu，原本是cpu
+        gpus="0,1,2",  # 添加gpu
         model_path="./",
     ):
         self.model = model  # for uniform weights save method in one gpu or multi gpu
@@ -41,26 +41,26 @@ class CTRTrainer(object):
         if len(gpus) > 1:
             print('parallel running on these gpus:', gpus)
             self.model = torch.nn.DataParallel(self.model, device_ids=gpus)
-        self.device = torch.device(device)  #torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(device)  # torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
-        if optimizer_params is None:
+        if optimizer_params is None:  # 优化器参数
             optimizer_params = {"lr": 1e-3, "weight_decay": 1e-5}
-        self.optimizer = optimizer_fn(self.model.parameters(), **optimizer_params)  #default optimizer
+        self.optimizer = optimizer_fn(self.model.parameters(), **optimizer_params)  # default optimizer
         self.scheduler = None
-        if scheduler_fn is not None:
+        if scheduler_fn is not None:  # 学习率参数
             self.scheduler = scheduler_fn(self.optimizer, **scheduler_params)
-        self.criterion = torch.nn.BCELoss()  #default loss cross_entropy
-        self.evaluate_fn = roc_auc_score  #default evaluate function
+        self.criterion = torch.nn.BCELoss()  # default loss cross_entropy 将二元交叉熵损失设置为默认损失函数
+        self.evaluate_fn = roc_auc_score  # default evaluate function 将ROC AUC得分函数设置为默认评估函数
         self.n_epoch = n_epoch
-        self.early_stopper = EarlyStopper(patience=earlystop_patience)
-        self.model_path = model_path
+        self.early_stopper = EarlyStopper(patience=earlystop_patience)  # 创建一个早停对象，基于提供的earlystop_patience参数
+        self.model_path = model_path # 设置模型路径属性
 
     def train_one_epoch(self, data_loader, log_interval=10):
         self.model.train()
         total_loss = 0
-        tk0 = tqdm.tqdm(data_loader, desc="train", smoothing=0, mininterval=1.0)
+        tk0 = tqdm.tqdm(data_loader, desc="train", smoothing=0, mininterval=1.0)  # 初始化一个进度条，跟踪data_loader
         for i, (x_dict, y) in enumerate(tk0):
-            x_dict = {k: v.to(self.device) for k, v in x_dict.items()}  #tensor to GPU
+            x_dict = {k: v.to(self.device) for k, v in x_dict.items()}  # tensor to GPU
             y = y.to(self.device)
             y_pred = self.model(x_dict)
             loss = self.criterion(y_pred, y.float())
@@ -87,7 +87,7 @@ class CTRTrainer(object):
                     print(f'validation: best auc: {self.early_stopper.best_auc}')
                     self.model.load_state_dict(self.early_stopper.best_weights)
                     break
-        torch.save(self.model.state_dict(), os.path.join(self.model_path, "model.pth"))  #save best auc model
+        torch.save(self.model.state_dict(), os.path.join(self.model_path, "model.pth"))  # save best auc model
 
     def evaluate(self, model, data_loader):
         model.eval()

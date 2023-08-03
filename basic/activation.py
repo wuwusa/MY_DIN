@@ -24,6 +24,14 @@ class Dice(nn.Module):
         ps = nn.Sigmoid()(ps)  # N * 1
         return ps * x + (1 - ps) * self.alpha * x
 
+# 和下面的步骤是一样的意思
+# def forward(self, x):
+#
+#         norm_x = (x - x.mean(dim=0)) / torch.sqrt(x.var(dim=0) + self.epsilon)
+#         p = torch.sigmoid(norm_x)
+#         x = self.alpha * x.mul(1-p) + x.mul(p)
+#
+#         return x
 
 # 这是一个自定义的激活函数，称为 Dice 激活函数，
 
